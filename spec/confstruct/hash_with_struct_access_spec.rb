@@ -86,9 +86,18 @@ describe Confstruct::HashWithStructAccess do
         @hwsa.methods.should include("#{m}=")
       end
     end
+
+    it 'should #deep_merge when empty' do
+      hash = Confstruct::HashWithStructAccess.new
+      merge_source = { 'a' => { 'b' => 'c', 'c' => 'd' }, 'b' => { 'b' => 'a', 'c' => 'd' } }
+      hash.deep_merge!(merge_source)
+
+      hash.should == { :a  => { :b => 'c', :c => 'd' }, :b => { :b => 'a', :c => 'd' } }
+    end
     
     it "should #deep_merge" do
-      hwsa = @hwsa.deep_merge({ :new_foo => 'bar', :github => { :default_branch => 'develop' } })
+      merge_source = { 'a' => { 'b' => 'c' }, 'b' => { 'c' => 'd' } }
+      hwsa = @hwsa.deep_merge(merge_source)
       @hwsa.should == @hash
       hwsa.should_not == @hwsa
       hwsa.should_not == @hash
@@ -98,7 +107,9 @@ describe Confstruct::HashWithStructAccess do
         :github => { 
           :url => 'http://www.github.com/mbklein/confstruct',
           :default_branch => 'develop'
-        }
+        },
+        :a => { :b => 'c' },
+        :b => { :c => 'd' }
       }
     end
 

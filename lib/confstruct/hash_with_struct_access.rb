@@ -211,19 +211,28 @@ module Confstruct
      keys.collect { |k| self[k] }
     end
 
-    protected 
+    protected
+
+    def coerce_hash(hash)
+      hash.kind
+    end
+
     def do_deep_merge! source, target
+      puts "src before: #{source.inspect}"
+      puts "dst before: #{target.inspect}"
       source.each_pair do |k,v|
         if target.has_key?(k)
           if v.respond_to?(:each_pair) and target[k].respond_to?(:merge)
             do_deep_merge! v, target[k]
           elsif v != target[k]
-            target[k] = v
+            target[k] = v.dup
           end
         else
-          target[k] = v
+          target[k] = structurize!(v)
         end
       end
+      puts "src after: #{source.inspect}"
+      puts "dst after: #{target.inspect}"
       target
     end
 
